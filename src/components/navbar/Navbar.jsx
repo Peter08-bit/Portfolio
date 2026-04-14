@@ -93,7 +93,7 @@ const Navbar = () => {
           onClick={() => scrollTo("hero")}
           className="flex items-center gap-2 font-bold uppercase text-white hover:opacity-80 transition"
         >
-        <img src="/public/AM.png" alt="logo" className="w-13 h-10" />
+        <img src="/AM.png" alt="logo" className="w-13 h-10" />
           <p className="text-green-400">MAHASARO</p>
         </button>
 
