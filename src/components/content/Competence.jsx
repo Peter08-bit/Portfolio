@@ -2,18 +2,18 @@ import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// ✅ Icons corrigés et ajoutés
 import { 
-  FaReact, FaJs, FaNodeJs, FaGitAlt, FaFigma, FaPython, FaPhp 
+  FaReact, FaJs, FaNodeJs, FaGitAlt, FaFigma, FaPython, FaPhp,
+  FaHtml5, FaCss3Alt, FaVuejs
 } from "react-icons/fa";
 
 import { 
-  SiTypescript, SiNextdotjs, SiTailwindcss, SiVite, SiGithub, SiLaravel 
+  SiTypescript, SiNextdotjs, SiTailwindcss, SiVite, SiGithub, 
+  SiLaravel, SiFlutter, SiMongodb, SiVercel
 } from "react-icons/si";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ✅ Icon n8n custom
 const N8nIcon = () => (
   <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
     <rect width="100" height="100" rx="16" fill="#EA4B71" />
@@ -21,36 +21,41 @@ const N8nIcon = () => (
   </svg>
 );
 
-// ✅ DATA corrigée
 const categories = [
   {
     title: "Frontend Development",
     skills: [
-      { name: "React.js",     icon: <FaReact />,      color: "text-cyan-400",   level: "Expert",   progress: 90 },
-      { name: "JavaScript",   icon: <FaJs />,         color: "text-yellow-400", level: "Expert",   progress: 95 },
-      { name: "TypeScript",   icon: <SiTypescript />, color: "text-blue-500",   level: "Advanced", progress: 80 },
-      { name: "Next.js",      icon: <SiNextdotjs />,  color: "text-white",      level: "Advanced", progress: 75 },
-      { name: "Tailwind CSS", icon: <SiTailwindcss />,color: "text-cyan-400",   level: "Expert",   progress: 90 },
-      { name: "Laravel",      icon: <SiLaravel />,    color: "text-red-500",    level: "Advanced", progress: 80 },
+      { name: "HTML",         icon: <FaHtml5 />,       color: "text-orange-500", level: "Expert",      progress: 90 },
+      { name: "CSS",          icon: <FaCss3Alt />,     color: "text-blue-400",   level: "Expert",      progress: 90 },
+      { name: "React.js",     icon: <FaReact />,       color: "text-cyan-400",   level: "Expert",      progress: 90 },
+      { name: "JavaScript",   icon: <FaJs />,          color: "text-yellow-400", level: "Expert",      progress: 95 },
+      { name: "TypeScript",   icon: <SiTypescript />,  color: "text-blue-500",   level: "Advanced",    progress: 80 },
+      { name: "Next.js",      icon: <SiNextdotjs />,   color: "text-white",      level: "Advanced",    progress: 75 },
+      { name: "Tailwind CSS", icon: <SiTailwindcss />, color: "text-cyan-400",   level: "Expert",      progress: 90 },
+      { name: "Laravel",      icon: <SiLaravel />,     color: "text-red-500",    level: "Advanced",    progress: 80 },
+      { name: "Flutter",      icon: <SiFlutter />,     color: "text-blue-400",   level: "Advanced",    progress: 80 },
+      { name: "Vue.js",       icon: <FaVuejs />,       color: "text-green-400",  level: "Advanced",    progress: 80 },
     ],
   },
   {
     title: "Backend & APIs",
     skills: [
-      { name: "Node.js",   icon: <FaNodeJs />, color: "text-green-500", level: "Intermediate", progress: 70 },
-      { name: "REST APIs", icon: <FaNodeJs />, color: "text-green-400", level: "Advanced",     progress: 85 },
-      { name: "Python",    icon: <FaPython />, color: "text-yellow-400", level: "Advanced",    progress: 85 },
-      { name: "PHP",       icon: <FaPhp />,    color: "text-indigo-400", level: "Advanced",    progress: 80 },
+      { name: "Node.js",   icon: <FaNodeJs />, color: "text-green-500",  level: "Intermediate", progress: 70 },
+      { name: "REST APIs", icon: <FaNodeJs />, color: "text-green-400",  level: "Advanced",     progress: 85 },
+      { name: "Python",    icon: <FaPython />, color: "text-yellow-400", level: "Advanced",     progress: 85 },
+      { name: "PHP",       icon: <FaPhp />,    color: "text-indigo-400", level: "Advanced",     progress: 80 },
     ],
   },
   {
     title: "Tools & Others",
     skills: [
-      { name: "Git",    icon: <FaGitAlt />,   color: "text-orange-500", level: "Advanced",     progress: 85 },
-      { name: "GitHub", icon: <SiGithub />,   color: "text-white",      level: "Advanced",     progress: 85 },
-      { name: "Figma",  icon: <FaFigma />,    color: "text-purple-400", level: "Intermediate", progress: 70 },
-      { name: "Vite",   icon: <SiVite />,     color: "text-yellow-300", level: "Advanced",     progress: 80 },
-      { name: "N8N",    icon: <N8nIcon />,    color: "text-pink-400",   level: "Intermediate", progress: 70 },
+      { name: "Git",     icon: <FaGitAlt />,  color: "text-orange-500", level: "Advanced",     progress: 85 },
+      { name: "GitHub",  icon: <SiGithub />,  color: "text-white",      level: "Advanced",     progress: 85 },
+      { name: "Figma",   icon: <FaFigma />,   color: "text-purple-400", level: "Intermediate", progress: 70 },
+      { name: "Vite",    icon: <SiVite />,    color: "text-yellow-300", level: "Advanced",     progress: 80 },
+      { name: "N8N",     icon: <N8nIcon />,   color: "text-pink-400",   level: "Intermediate", progress: 70 },
+      { name: "MongoDB", icon: <SiMongodb />, color: "text-green-500",  level: "Intermediate", progress: 70 },
+      { name: "Vercel",  icon: <SiVercel />,  color: "text-white",      level: "Intermediate", progress: 70 },
     ],
   },
 ];
