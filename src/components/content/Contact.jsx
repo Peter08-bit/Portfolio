@@ -110,11 +110,11 @@ const Contact = () => {
 
         {/* Title */}
         <h1 className="fade-in text-center text-green-400 text-5xl font-bold mb-4">
-          Let's Work Together
+         Travaillons ensemble
         </h1>
 
         <p className="fade-in text-center text-white mb-12">
-          Have a project in mind? Let's discuss how we can bring your ideas to life.
+         Vous avez un projet en tête ? Parlons-en et voyons comment nous pouvons donner vie à vos idées.
         </p>
 
         <div className="grid md:grid-cols-2 gap-10">
@@ -191,7 +191,7 @@ const Contact = () => {
                   bg-gradient-to-r from-green-400 to-emerald-500
                   hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-60"
               >
-                {loading ? "Envoi en cours..." : "Send Message ✈️"}
+                {loading ? "Envoi en cours..." : "Envoyer un message️"}
               </button>
 
             </form>
@@ -200,9 +200,9 @@ const Contact = () => {
           {/* ───── RIGHT SIDE ───── */}
           <div className="fade-in flex flex-col gap-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-2">Let's Connect</h2>
+              <h2 className="text-2xl font-semibold mb-2">Connectons-nous</h2>
               <p className="text-gray-400 text-sm">
-                I'm always open to discussing new projects or opportunities.
+              Je suis toujours ouvert à la discussion de nouveaux projets ou opportunités.
               </p>
             </div>
 

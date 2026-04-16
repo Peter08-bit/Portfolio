@@ -194,11 +194,11 @@ const Competence = () => {
       <div className="max-w-6xl mx-auto relative z-10">
 
         <h1 className="text-center text-4xl md:text-5xl font-bold mb-4 text-green-400">
-          Skills & Technologies
+         Compétences et technologies
         </h1>
 
         <p className="text-center text-gray-400 mb-16">
-          A comprehensive overview of my technical skills
+          Un aperçu complet de mes compétences techniques
         </p>
 
         <div className="grid md:grid-cols-3 gap-8" style={{ perspective: "1200px" }}>

@@ -110,11 +110,11 @@ const Projet = () => {
 
         {/* Title */}
         <h1 className="text-center text-4xl md:text-6xl font-bold mb-4 text-green-400">
-          Featured Projects
+         Projets en vedette
         </h1>
 
         <p className="text-center text-gray-400 mb-12">
-          Showcasing my best work and achievements
+       Présentation de mes meilleurs travaux et réalisations
         </p>
 
         {/* Filters */}
