@@ -8,8 +8,7 @@ const Contact = () => {
   const [form, setForm] = useState({ nom: "", email: "", message: "" });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [sendError, setSendError] = useState(false);
+  const [popup, setPopup] = useState({ show: false, type: "", title: "", message: "" });
 
   // ── GSAP Animation ──
   useEffect(() => {
@@ -42,7 +41,7 @@ const Contact = () => {
     let newErrors = {};
     if (!form.nom) newErrors.nom = "Nom requis";
     if (!form.email.includes("@")) newErrors.email = "Email invalide";
-    if (form.message.length < 10) newErrors.message = "Message trop court";
+    if (form.message.length < 10) newErrors.message = "Message trop court (min 10 caractères)";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -53,7 +52,6 @@ const Contact = () => {
     if (!validate()) return;
 
     setLoading(true);
-    setSendError(false);
 
     try {
       const response = await fetch(N8N_WEBHOOK_URL, {
@@ -72,17 +70,34 @@ const Contact = () => {
         throw new Error(`Erreur HTTP : ${response.status}`);
       }
 
-      // Succès
-      setShowPopup(true);
+      // Succès - Afficher popup de confirmation
+      setPopup({
+        show: true,
+        type: "success",
+        title: "✅ Message envoyé !",
+        message: "Merci de m'avoir contacté. Je vous répondrai très bientôt. 🙏"
+      });
+      
       setForm({ nom: "", email: "", message: "" });
       setErrors({});
 
     } catch (error) {
       console.error("Erreur n8n webhook :", error);
-      setSendError(true);
+      // Erreur - Afficher popup d'erreur
+      setPopup({
+        show: true,
+        type: "error",
+        title: "❌ Erreur d'envoi",
+        message: "Une erreur est survenue. Vérifiez votre connexion et réessayez."
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  // Fermer la popup
+  const closePopup = () => {
+    setPopup({ ...popup, show: false });
   };
 
   // ── Ripple effect ──
@@ -175,13 +190,6 @@ const Contact = () => {
                 {errors.message && <p className="text-red-400 text-xs mt-1">{errors.message}</p>}
               </div>
 
-              {/* Erreur d'envoi */}
-              {sendError && (
-                <p className="text-red-400 text-sm text-center">
-                  ❌ Une erreur est survenue. Vérifiez votre connexion et réessayez.
-                </p>
-              )}
-
               {/* Button */}
               <button
                 type="submit"
@@ -191,7 +199,7 @@ const Contact = () => {
                   bg-gradient-to-r from-green-400 to-emerald-500
                   hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-60"
               >
-                {loading ? "Envoi en cours..." : "Envoyer un message️"}
+                {loading ? "Envoi en cours..." : "Envoyer un message ✨"}
               </button>
 
             </form>
@@ -225,47 +233,86 @@ const Contact = () => {
         </div>
       </div>
 
-      {/* ───── POPUP DE SUCCÈS ───── */}
-      {showPopup && (
+      {/* ───── SWEET ALERT POPUP CONFIRMATION ───── */}
+      {popup.show && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          onClick={() => setShowPopup(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-fadeIn"
+          onClick={closePopup}
         >
           <div
-            className="bg-[#0d1117] border border-green-400/40 rounded-2xl p-8 text-center max-w-sm w-full mx-4 shadow-2xl"
-            style={{ animation: "popupIn 0.3s ease forwards" }}
+            className={`relative bg-gradient-to-br from-[#0d1117] to-[#161b22] 
+              border-2 rounded-2xl p-8 text-center max-w-md w-full mx-4 shadow-2xl
+              ${popup.type === 'success' ? 'border-green-400/60' : 'border-red-400/60'}
+              animate-slideIn`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-16 h-16 mx-auto mb-5 rounded-full border-2 border-green-400 bg-green-400/10 flex items-center justify-center">
-              <svg
-                className="w-7 h-7 text-green-400"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                viewBox="0 0 24 24"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
+            {/* Animation confettis pour le succès */}
+            {popup.type === 'success' && (
+              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+                <div className="confetti absolute top-0 left-1/4 animate-confetti-1">🎉</div>
+                <div className="confetti absolute top-0 left-1/2 animate-confetti-2">✨</div>
+                <div className="confetti absolute top-0 left-3/4 animate-confetti-3">🎊</div>
+              </div>
+            )}
+
+            {/* Icône animée */}
+            <div className={`relative z-10 w-20 h-20 mx-auto mb-6 rounded-full 
+              flex items-center justify-center animate-bounce-in
+              ${popup.type === 'success' 
+                ? 'border-2 border-green-400 bg-green-400/20' 
+                : 'border-2 border-red-400 bg-red-400/20'}`}>
+              {popup.type === 'success' ? (
+                <svg
+                  className="w-10 h-10 text-green-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  viewBox="0 0 24 24"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg
+                  className="w-10 h-10 text-red-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              )}
             </div>
 
-            <h3 className="text-green-400 text-xl font-semibold mb-2">
-              Message envoyé !
+            {/* Titre */}
+            <h3 className={`relative z-10 text-2xl font-bold mb-3
+              ${popup.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+              {popup.title}
             </h3>
-            <p className="text-gray-400 text-sm mb-6">
-              Merci de m'avoir contacté. Je vous répondrai très bientôt. 🙏
+
+            {/* Message */}
+            <p className="relative z-10 text-gray-300 text-sm mb-8 leading-relaxed">
+              {popup.message}
             </p>
 
+            {/* Bouton de fermeture */}
             <button
-              onClick={() => setShowPopup(false)}
-              className="bg-gradient-to-r from-green-400 to-emerald-500 text-black font-semibold px-8 py-2.5 rounded-lg hover:scale-105 transition-all duration-300"
+              onClick={closePopup}
+              className={`relative z-10 font-semibold px-8 py-3 rounded-xl 
+                transition-all duration-300 transform hover:scale-105 shadow-lg
+                ${popup.type === 'success'
+                  ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-black hover:shadow-green-500/30'
+                  : 'bg-gradient-to-r from-red-400 to-red-500 text-white hover:shadow-red-500/30'}`}
             >
-              Fermer
+              Super ! ✨
             </button>
           </div>
         </div>
       )}
 
-      {/* CSS */}
+      {/* CSS avec animations améliorées */}
       <style>{`
         .ripple {
           position: absolute;
@@ -274,12 +321,101 @@ const Contact = () => {
           transform: scale(0);
           animation: ripple 0.6s linear;
         }
+        
         @keyframes ripple {
           to { transform: scale(4); opacity: 0; }
         }
-        @keyframes popupIn {
-          from { transform: scale(0.8); opacity: 0; }
-          to   { transform: scale(1);   opacity: 1; }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+          from {
+            transform: scale(0.8) translateY(-50px);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes bounceIn {
+          0% {
+            transform: scale(0);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes confetti1 {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(300px) rotate(360deg);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes confetti2 {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(300px) rotate(-360deg);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes confetti3 {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(300px) rotate(720deg);
+            opacity: 0;
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease forwards;
+        }
+        
+        .animate-slideIn {
+          animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+        
+        .animate-bounce-in {
+          animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+        
+        .animate-confetti-1 {
+          animation: confetti1 2s ease-out forwards;
+        }
+        
+        .animate-confetti-2 {
+          animation: confetti2 2.5s ease-out forwards;
+        }
+        
+        .animate-confetti-3 {
+          animation: confetti3 2s ease-out forwards;
+        }
+        
+        .confetti {
+          font-size: 24px;
+          pointer-events: none;
         }
       `}</style>
     </section>
