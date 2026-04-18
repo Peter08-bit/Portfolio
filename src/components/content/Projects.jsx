@@ -31,11 +31,18 @@ const projects = [
     desc: "Une assistance Chatbot dans une page facebook et qui repond des client",
     tech: ["N8N", "JS"],
   },
-      {
+  {
     title: "Recevoir Email",
     category: "N8N",
     image: "/N8N2.jpeg",
     desc: "Une assistance Chatbot pour envoyer un email automatique",
+    tech: ["N8N", "JS"],
+  },
+    {
+    title: "Recevoir Email",
+    category: "N8N",
+    image: "/N8N3.jpeg",
+    desc: "Une workflow  automation avec N8N ce concerner E-commerce",
     tech: ["N8N", "JS"],
   },
 ];
