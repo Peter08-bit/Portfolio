@@ -1,49 +1,65 @@
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import cvFile from "../../assets/CV2.pdf";
+import cvFile from "../../assets/CV-Peter-AdvinN8N.pdf";
 
 const About = () => {
   const textRef = useRef(null);
   const containerRef = useRef(null);
   const [active, setActive] = useState(false);
+  const [displayText, setDisplayText] = useState("");
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
 
   useEffect(() => {
     gsap.fromTo(
       ".fade-up",
       { y: 35, opacity: 0 },
-      { y: 0, opacity: 1, duration: 6, stagger: 0.1, ease: "power6.out" }
+      { y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out" }
     );
   }, []);
 
+  // Effet de typing amélioré et stable
   useEffect(() => {
-    const words = ["Developer FullStack & Developpeur N8N"];
-    let i = 0;
-    let j = 0;
+    const words = ["Developer FullStack", "Workflow Automation N8N"];
+    let wordIndex = 0;
+    let charIndex = 0;
     let isDeleting = false;
+    let timeoutId;
 
     const type = () => {
-      const currentWord = words[i];
-      if (textRef.current) {
-        textRef.current.textContent = currentWord.substring(0, j);
+      const currentWord = words[wordIndex];
+      
+      if (!isDeleting && charIndex <= currentWord.length) {
+        setDisplayText(currentWord.substring(0, charIndex));
+        charIndex++;
+        timeoutId = setTimeout(type, 100);
+      } 
+      else if (isDeleting && charIndex >= 0) {
+        setDisplayText(currentWord.substring(0, charIndex));
+        charIndex--;
+        timeoutId = setTimeout(type, 50);
       }
-      if (!isDeleting) {
-        j++;
-        if (j === currentWord.length) {
+      else if (!isDeleting && charIndex > currentWord.length) {
+        setIsTypingComplete(true);
+        timeoutId = setTimeout(() => {
           isDeleting = true;
-          setTimeout(type, 1000);
-          return;
-        }
-      } else {
-        j--;
-        if (j === 0) {
-          isDeleting = false;
-          i = (i + 1) % words.length;
-        }
+          charIndex = currentWord.length;
+          setIsTypingComplete(false);
+          timeoutId = setTimeout(type, 50);
+        }, 2000);
       }
-      setTimeout(type, isDeleting ? 50 : 100);
+      else if (isDeleting && charIndex < 0) {
+        isDeleting = false;
+        wordIndex = (wordIndex + 1) % words.length;
+        charIndex = 0;
+        timeoutId = setTimeout(type, 200);
+      }
     };
 
     type();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   const handleMouseMove = (e) => {
@@ -69,13 +85,19 @@ const About = () => {
     }
   };
 
+  // Téléchargement du CV
   const handleDownloadCV = () => {
-    const link = document.createElement("a");
-    link.href = cvFile;
-    link.setAttribute("download", "CV2.pdf");
-    document.body.appendChild(link);   // ✅ IMPORTANT
-    link.click();
-    document.body.removeChild(link);   // ✅ nettoyage
+    try {
+      const link = document.createElement("a");
+      link.href = cvFile;
+      link.download = "CV-Peter-Advin.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      console.log("Téléchargement démarré");
+    } catch (error) {
+      console.error("Erreur de téléchargement:", error);
+    }
   };
 
   return (
@@ -105,14 +127,14 @@ const About = () => {
             du concept au déploiement, tout en garantissant un code propre, maintenable et efficace.
           </p>
 
-          {/* ✅ BOUTON CV CORRIGÉ */}
-          <a
-            href={cvFile}
-            download="CV-Peter-Advin.pdf"
-            className="fade-up inline-flex items-center gap-2 px-6 py-3 rounded-lg border transition-all duration-500 text-sm sm:text-base bg-white/10 border-green-400 hover:bg-green-500/30 hover:shadow-[0_0_25px_rgba(0,255,150,0.4)]"
+          {/* Bouton CV */}
+          <button
+            onClick={handleDownloadCV}
+            className="fade-up inline-flex items-center gap-2 px-6 py-3 rounded-lg border transition-all duration-500 text-sm sm:text-base bg-white/10 border-green-400 hover:bg-green-500/30 hover:shadow-[0_0_25px_rgba(0,255,150,0.4)] cursor-pointer group"
           >
-            ⬇️ Télécharger mon CV
-          </a>
+            <span className="text-lg group-hover:animate-bounce">⬇️</span>
+            Télécharger mon CV
+          </button>
         </div>
 
         {/* RIGHT — carte avatar */}
@@ -153,8 +175,28 @@ const About = () => {
             <span className="text-green-400">Peter Advin</span>
           </h2>
 
-          {/* Typing */}
-          <p ref={textRef} className="mt-4 text-base sm:text-lg text-green-400 min-h-[1.5em]"></p>
+          {/* Typing - Version stable */}
+          <div className="mt-4 min-h-[3rem]">
+            <p className="text-base sm:text-lg text-green-400 font-medium">
+              {displayText}
+              {!isTypingComplete && (
+                <span className="inline-block w-[2px] h-5 bg-green-400 ml-1 animate-pulse"></span>
+              )}
+            </p>
+          </div>
+
+          {/* Badge supplémentaire pour stabilité */}
+          <div className="mt-3 flex gap-2 justify-center flex-wrap">
+            <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-300 border border-green-500/30">
+              React
+            </span>
+            <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-300 border border-green-500/30">
+              Node.js
+            </span>
+            <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-300 border border-green-500/30">
+              n8n
+            </span>
+          </div>
         </div>
 
       </div>
