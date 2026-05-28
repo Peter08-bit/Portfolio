@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import cvFile from "../../assets/CV-Peter-AdvinN8N.pdf";
+import cvFile from "../../assets/CV-MAHASARO.pdf";
 import { 
   FaDownload, 
   FaCode, 
