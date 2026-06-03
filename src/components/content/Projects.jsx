@@ -39,7 +39,7 @@ const projects = [
     githubLink: "#"
   },
   {
-    title: "Component Library",
+    title: "Skynegis",
     category: "Mobile",
     image: "/Mob1.jfif",
     desc: "Application React Native de scan QR code sécurisé pour certificats étudiants.",
