@@ -47,6 +47,15 @@ const projects = [
     demoLink: "#",
     githubLink: "#"
   },
+    {
+    title: "Component Library",
+    category: "Mobile",
+    image: "/Skynegis.png",
+    desc: "Skynegys est votre ange gardien numérique au quotidien. Conçue pour assurer votre sécurité et celle de vos proches, l'application veille sur vous à chaque instant grâce à une détection intelligente d'inactivité, un système de cercles sécurisés et un déclencheur d'urgence SOS instantané.",
+    tech: ["React Native", "Expo Go"],
+    demoLink: "#",
+    githubLink: "#"
+  },
   {
     title: "Automatisation Facebook",
     category: "N8N",
