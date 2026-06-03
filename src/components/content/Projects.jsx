@@ -39,7 +39,7 @@ const projects = [
     githubLink: "#"
   },
   {
-    title: "Skynegis",
+    title: "Application scan QR Code",
     category: "Mobile",
     image: "/Mob1.jfif",
     desc: "Application React Native de scan QR code sécurisé pour certificats étudiants.",
@@ -48,7 +48,7 @@ const projects = [
     githubLink: "#"
   },
     {
-    title: "Component Library",
+    title: "Skynegis",
     category: "Mobile",
     image: "/Skynegis.png",
     desc: "Skynegys est votre ange gardien numérique au quotidien. Conçue pour assurer votre sécurité et celle de vos proches, l'application veille sur vous à chaque instant grâce à une détection intelligente d'inactivité, un système de cercles sécurisés et un déclencheur d'urgence SOS instantané.",
