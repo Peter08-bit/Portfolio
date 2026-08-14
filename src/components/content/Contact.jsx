@@ -1,424 +1,164 @@
-import React, { useState, useEffect } from "react";
-import { gsap } from "gsap";
+import React, { useState } from "react";
+import { FaPaperPlane, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaCheckCircle, FaExclamationCircle, FaTimes } from "react-icons/fa";
+import { HiOutlineSparkles } from "react-icons/hi";
 
-// ✅ Remplacez par l'URL Webhook de votre workflow n8n
 const N8N_WEBHOOK_URL = "https://peter08.app.n8n.cloud/webhook/9ac40b09-4f2a-4f8b-9f6a-d53313f4f1f2";
 
 const Contact = () => {
-  const [form, setForm] = useState({ nom: "", email: "", message: "" });
+  const [form, setForm] = useState({ nom: "", email: "", subject: "", message: "" });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [popup, setPopup] = useState({ show: false, type: "", title: "", message: "" });
 
-  // ── GSAP Animation ──
-  useEffect(() => {
-    gsap.fromTo(
-      ".fade-in",
-      { opacity: 0, y: 40, scale: 0.95 },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 1,
-        stagger: 0.15,
-        ease: "power3.out",
-      }
-    );
-  }, []);
-
-  // ── Glow souris ──
-  const handleMouseMove = (e) => {
-    document.documentElement.style.setProperty("--x", `${e.clientX}px`);
-    document.documentElement.style.setProperty("--y", `${e.clientY}px`);
-  };
-
-  // ── Form handling ──
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: null });
   };
 
   const validate = () => {
-    let newErrors = {};
-    if (!form.nom) newErrors.nom = "Nom requis";
-    if (!form.email.includes("@")) newErrors.email = "Email invalide";
-    if (form.message.length < 10) newErrors.message = "Message trop court (min 10 caractères)";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    let errs = {};
+    if (!form.nom.trim()) errs.nom = "Votre nom est requis";
+    if (!form.email.trim() || !form.email.includes("@")) errs.email = "Email valide requis";
+    if (!form.message.trim() || form.message.length < 10) errs.message = "Au moins 10 caractères";
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
-  // ── Envoi vers le Webhook n8n ──
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
     setLoading(true);
-
     try {
       const response = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from_name: form.nom,
-          from_email: form.email,
-          message: form.message,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from_name: form.nom, from_email: form.email, subject: form.subject || "Contact Portfolio", message: form.message, date: new Date().toISOString() }),
       });
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP : ${response.status}`);
-      }
-
-      // Succès - Afficher popup de confirmation
-      setPopup({
-        show: true,
-        type: "success",
-        title: "✅ Message envoyé !",
-        message: "Merci de m'avoir contacté. Je vous répondrai très bientôt. 🙏"
-      });
-      
-      setForm({ nom: "", email: "", message: "" });
+      if (!response.ok) throw new Error(`Status: ${response.status}`);
+      setPopup({ show: true, type: "success", title: "Message transmis avec succès", message: "Merci d'avoir pris contact ! Je vous répondrai dans les plus brefs délais." });
+      setForm({ nom: "", email: "", subject: "", message: "" });
       setErrors({});
-
-    } catch (error) {
-      console.error("Erreur n8n webhook :", error);
-      // Erreur - Afficher popup d'erreur
-      setPopup({
-        show: true,
-        type: "error",
-        title: "❌ Erreur d'envoi",
-        message: "Une erreur est survenue. Vérifiez votre connexion et réessayez."
-      });
+    } catch (err) {
+      setPopup({ show: true, type: "error", title: "Échec de l'envoi", message: "Erreur réseau. Contactez-moi directement par e-mail ou WhatsApp." });
     } finally {
       setLoading(false);
     }
   };
 
-  // Fermer la popup
-  const closePopup = () => {
-    setPopup({ ...popup, show: false });
-  };
-
-  // ── Ripple effect ──
-  const handleRipple = (e) => {
-    const button = e.currentTarget;
-    const circle = document.createElement("span");
-    const diameter = Math.max(button.clientWidth, button.clientHeight);
-    circle.style.width = circle.style.height = `${diameter}px`;
-    circle.style.left = `${e.clientX - button.offsetLeft - diameter / 2}px`;
-    circle.style.top = `${e.clientY - button.offsetTop - diameter / 2}px`;
-    circle.classList.add("ripple");
-    button.appendChild(circle);
-    setTimeout(() => circle.remove(), 600);
-  };
+  const contactCards = [
+    { icon: <FaEnvelope className="text-emerald-600" size={16} />, label: "Courriel", val: "mahasaroadvin@gmail.com", link: "mailto:mahasaroadvin@gmail.com" },
+    { icon: <FaWhatsapp className="text-emerald-600" size={16} />, label: "WhatsApp", val: "+261 34 50 025 48", link: "https://wa.me/261345002548" },
+    { icon: <FaMapMarkerAlt className="text-teal-600" size={16} />, label: "Localisation", val: "Madagascar (UTC+3)", link: null },
+  ];
 
   return (
-    <section
-      onMouseMove={handleMouseMove}
-      className="relative min-h-screen text-white px-4 py-24 overflow-hidden"
-    >
-      {/* Glow dynamique */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_var(--x)_var(--y),rgba(0,255,150,0.15),transparent_40%)]" />
-
-      <div className="relative max-w-6xl mx-auto">
-
-        {/* Title */}
-        <h1 className="fade-in text-center text-green-400 text-5xl font-bold mb-4">
-         Travaillons ensemble
-        </h1>
-
-        <p className="fade-in text-center text-white mb-12">
-         Vous avez un projet en tête ? Parlons-en et voyons comment nous pouvons donner vie à vos idées.
+    <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 py-6">
+      {/* En-tête */}
+      <div className="flex flex-col items-center text-center mb-12">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-sm mb-3">
+          <HiOutlineSparkles size={12} className="text-emerald-600" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-700">Contact & Collaborations</span>
+        </div>
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-slate-900 tracking-tight mb-2">
+          Démarrons un <span className="text-gradient-emerald">Projet</span>
+        </h2>
+        <p className="text-xs sm:text-sm text-slate-600 max-w-xl">
+          Une idée d'application, un besoin d'automatisation ou une proposition de mission ? Échangeons ensemble.
         </p>
+      </div>
 
-        <div className="grid md:grid-cols-2 gap-10">
-
-          {/* ───── FORM ───── */}
-          <div className="fade-in bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-
-              {/* Nom */}
-              <div className="relative">
-                <input
-                  name="nom"
-                  value={form.nom}
-                  onChange={handleChange}
-                  placeholder=" "
-                  className="peer w-full bg-transparent border border-white/10 rounded-lg px-4 pt-5 pb-2 outline-none focus:border-green-400"
-                />
-                <label className="absolute left-4 top-2 text-gray-400 text-sm
-                  peer-placeholder-shown:top-3 peer-placeholder-shown:text-base
-                  peer-focus:top-2 peer-focus:text-sm transition-all">
-                  Name
-                </label>
-                {errors.nom && <p className="text-red-400 text-xs mt-1">{errors.nom}</p>}
-              </div>
-
-              {/* Email */}
-              <div className="relative">
-                <input
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder=" "
-                  className="peer w-full bg-transparent border border-white/10 rounded-lg px-4 pt-5 pb-2 outline-none focus:border-green-400"
-                />
-                <label className="absolute left-4 top-2 text-gray-400 text-sm
-                  peer-placeholder-shown:top-3 peer-placeholder-shown:text-base
-                  peer-focus:top-2 peer-focus:text-sm transition-all">
-                  Email
-                </label>
-                {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
-              </div>
-
-              {/* Message */}
-              <div className="relative">
-                <textarea
-                  name="message"
-                  value={form.message}
-                  onChange={handleChange}
-                  placeholder=" "
-                  rows={5}
-                  className="peer w-full bg-transparent border border-white/10 rounded-lg px-4 pt-5 pb-2 outline-none focus:border-green-400 resize-none"
-                />
-                <label className="absolute left-4 top-2 text-gray-400 text-sm
-                  peer-placeholder-shown:top-3 peer-placeholder-shown:text-base
-                  peer-focus:top-2 peer-focus:text-sm transition-all">
-                  Message
-                </label>
-                {errors.message && <p className="text-red-400 text-xs mt-1">{errors.message}</p>}
-              </div>
-
-              {/* Button */}
-              <button
-                type="submit"
-                onClick={handleRipple}
-                disabled={loading}
-                className="relative overflow-hidden py-3 rounded-lg font-semibold text-black
-                  bg-gradient-to-r from-green-400 to-emerald-500
-                  hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-60"
-              >
-                {loading ? "Envoi en cours..." : "Envoyer un message ✨"}
-              </button>
-
-            </form>
-          </div>
-
-          {/* ───── RIGHT SIDE ───── */}
-          <div className="fade-in flex flex-col gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start w-full">
+        {/* Coordonnées */}
+        <div className="lg:col-span-5 space-y-4">
+          <div className="glass-panel p-5 sm:p-7 rounded-2xl space-y-5 shadow-sm">
             <div>
-              <h2 className="text-2xl font-semibold mb-2">Connectons-nous</h2>
-              <p className="text-gray-400 text-sm">
-              Je suis toujours ouvert à la discussion de nouveaux projets ou opportunités.
+              <h3 className="font-display font-bold text-lg text-slate-900 mb-1.5">Canaux directs</h3>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Disponible pour des projets freelance, contrats ou opportunités. Réponse garantie sous 24h.
               </p>
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex gap-4 hover:border-green-400 transition">
-              <div className="text-green-400">📧</div>
-              <div>
-                <p className="text-sm text-gray-400">Email</p>
-                <p>mahasaroadvin@gmail.com</p>
-              </div>
+            <div className="space-y-3">
+              {contactCards.map((card, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-slate-200 hover:border-emerald-300 shadow-sm transition-all">
+                  <div className="p-2 rounded-xl bg-slate-50 border border-slate-200">{card.icon}</div>
+                  <div className="flex-1 min-w-0">
+                    <span className="block text-[11px] text-slate-500 font-medium">{card.label}</span>
+                    {card.link ? (
+                      <a href={card.link} target="_blank" rel="noreferrer" className="text-xs sm:text-sm font-semibold text-slate-900 hover:text-emerald-600 transition-colors truncate block">{card.val}</a>
+                    ) : (
+                      <span className="text-xs sm:text-sm font-semibold text-slate-900 block truncate">{card.val}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex gap-4 hover:border-green-400 transition">
-              <div className="text-green-400">📍</div>
-              <div>
-                <p className="text-sm text-gray-400">Location</p>
-                <p>Madagascar</p>
-              </div>
+            <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+              <span>Actuellement disponible pour de nouveaux mandats.</span>
             </div>
+          </div>
+        </div>
+
+        {/* Formulaire */}
+        <div className="lg:col-span-7">
+          <div className="glass-panel p-5 sm:p-7 rounded-2xl shadow-sm">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">Nom & Prénom <span className="text-emerald-600">*</span></label>
+                  <input type="text" name="nom" value={form.nom} onChange={handleChange} placeholder="Jean Dupont"
+                    className={`w-full bg-white border rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 outline-none transition-all shadow-sm ${errors.nom ? "border-red-400" : "border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"}`} />
+                  {errors.nom && <p className="text-[11px] text-red-500 mt-1">{errors.nom}</p>}
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">Email <span className="text-emerald-600">*</span></label>
+                  <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="jean@entreprise.com"
+                    className={`w-full bg-white border rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 outline-none transition-all shadow-sm ${errors.email ? "border-red-400" : "border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"}`} />
+                  {errors.email && <p className="text-[11px] text-red-500 mt-1">{errors.email}</p>}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">Sujet</label>
+                <input type="text" name="subject" value={form.subject} onChange={handleChange} placeholder="Création d'une application / Mission freelance"
+                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 shadow-sm transition-all" />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">Message <span className="text-emerald-600">*</span></label>
+                <textarea name="message" value={form.message} onChange={handleChange} rows={5} placeholder="Décrivez votre projet, vos besoins et vos objectifs..."
+                  className={`w-full bg-white border rounded-xl px-4 py-2.5 text-xs sm:text-sm text-slate-900 placeholder-slate-400 outline-none transition-all resize-none shadow-sm ${errors.message ? "border-red-400" : "border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"}`} />
+                {errors.message && <p className="text-[11px] text-red-500 mt-1">{errors.message}</p>}
+              </div>
+
+              <button type="submit" disabled={loading}
+                className="w-full inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold text-xs sm:text-sm shadow-[0_4px_16px_rgba(16,185,129,0.3)] hover:shadow-[0_6px_22px_rgba(16,185,129,0.45)] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                {loading ? <span>Transmission en cours...</span> : <><FaPaperPlane size={12} /><span>Envoyer mon message</span></>}
+              </button>
+            </form>
           </div>
         </div>
       </div>
 
-      {/* ───── SWEET ALERT POPUP CONFIRMATION ───── */}
+      {/* Modale */}
       {popup.show && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md animate-fadeIn"
-          onClick={closePopup}
-        >
-          <div
-            className={`relative bg-gradient-to-br from-[#0d1117] to-[#161b22] 
-              border-2 rounded-2xl p-8 text-center max-w-md w-full mx-4 shadow-2xl
-              ${popup.type === 'success' ? 'border-green-400/60' : 'border-red-400/60'}
-              animate-slideIn`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Animation confettis pour le succès */}
-            {popup.type === 'success' && (
-              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
-                <div className="confetti absolute top-0 left-1/4 animate-confetti-1">🎉</div>
-                <div className="confetti absolute top-0 left-1/2 animate-confetti-2">✨</div>
-                <div className="confetti absolute top-0 left-3/4 animate-confetti-3">🎊</div>
-              </div>
-            )}
-
-            {/* Icône animée */}
-            <div className={`relative z-10 w-20 h-20 mx-auto mb-6 rounded-full 
-              flex items-center justify-center animate-bounce-in
-              ${popup.type === 'success' 
-                ? 'border-2 border-green-400 bg-green-400/20' 
-                : 'border-2 border-red-400 bg-red-400/20'}`}>
-              {popup.type === 'success' ? (
-                <svg
-                  className="w-10 h-10 text-green-400"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                  viewBox="0 0 24 24"
-                >
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              ) : (
-                <svg
-                  className="w-10 h-10 text-red-400"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                  viewBox="0 0 24 24"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-              )}
-            </div>
-
-            {/* Titre */}
-            <h3 className={`relative z-10 text-2xl font-bold mb-3
-              ${popup.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
-              {popup.title}
-            </h3>
-
-            {/* Message */}
-            <p className="relative z-10 text-gray-300 text-sm mb-8 leading-relaxed">
-              {popup.message}
-            </p>
-
-            {/* Bouton de fermeture */}
-            <button
-              onClick={closePopup}
-              className={`relative z-10 font-semibold px-8 py-3 rounded-xl 
-                transition-all duration-300 transform hover:scale-105 shadow-lg
-                ${popup.type === 'success'
-                  ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-black hover:shadow-green-500/30'
-                  : 'bg-gradient-to-r from-red-400 to-red-500 text-white hover:shadow-red-500/30'}`}
-            >
-              Super ! ✨
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl text-center flex flex-col items-center">
+            <button onClick={() => setPopup({ ...popup, show: false })} className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 text-slate-500 hover:text-slate-900">
+              <FaTimes size={12} />
             </button>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${popup.type === "success" ? "bg-emerald-50 border border-emerald-200 text-emerald-600" : "bg-red-50 border border-red-200 text-red-600"}`}>
+              {popup.type === "success" ? <FaCheckCircle size={22} /> : <FaExclamationCircle size={22} />}
+            </div>
+            <h3 className="font-display font-bold text-base text-slate-900 mb-2">{popup.title}</h3>
+            <p className="text-xs text-slate-600 leading-relaxed mb-5">{popup.message}</p>
+            <button onClick={() => setPopup({ ...popup, show: false })} className="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-900 transition-colors">Fermer</button>
           </div>
         </div>
       )}
-
-      {/* CSS avec animations améliorées */}
-      <style>{`
-        .ripple {
-          position: absolute;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.4);
-          transform: scale(0);
-          animation: ripple 0.6s linear;
-        }
-        
-        @keyframes ripple {
-          to { transform: scale(4); opacity: 0; }
-        }
-        
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes slideIn {
-          from {
-            transform: scale(0.8) translateY(-50px);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes bounceIn {
-          0% {
-            transform: scale(0);
-            opacity: 0;
-          }
-          50% {
-            transform: scale(1.2);
-          }
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes confetti1 {
-          0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(300px) rotate(360deg);
-            opacity: 0;
-          }
-        }
-        
-        @keyframes confetti2 {
-          0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(300px) rotate(-360deg);
-            opacity: 0;
-          }
-        }
-        
-        @keyframes confetti3 {
-          0% {
-            transform: translateY(0) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(300px) rotate(720deg);
-            opacity: 0;
-          }
-        }
-        
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease forwards;
-        }
-        
-        .animate-slideIn {
-          animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-        }
-        
-        .animate-bounce-in {
-          animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-        }
-        
-        .animate-confetti-1 {
-          animation: confetti1 2s ease-out forwards;
-        }
-        
-        .animate-confetti-2 {
-          animation: confetti2 2.5s ease-out forwards;
-        }
-        
-        .animate-confetti-3 {
-          animation: confetti3 2s ease-out forwards;
-        }
-        
-        .confetti {
-          font-size: 24px;
-          pointer-events: none;
-        }
-      `}</style>
-    </section>
+    </div>
   );
 };
 

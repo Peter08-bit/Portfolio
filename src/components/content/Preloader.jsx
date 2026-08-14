@@ -7,25 +7,24 @@ const Preloader = ({ onFinish }) => {
   useEffect(() => {
     let p = 0;
     const interval = setInterval(() => {
-      p += Math.random() * 8 + 2;
+      p += Math.floor(Math.random() * 12) + 4;
       if (p >= 100) {
         p = 100;
         setProgress(100);
         clearInterval(interval);
 
-        // Délai puis animation de sortie
         setTimeout(() => {
           gsap.to("#preloader-overlay", {
             opacity: 0,
-            duration: 0.8,
-            ease: "power3.inOut",
+            duration: 0.5,
+            ease: "power2.inOut",
             onComplete: onFinish,
           });
-        }, 500);
+        }, 250);
       } else {
-        setProgress(Math.round(p));
+        setProgress(p);
       }
-    }, 100);
+    }, 50);
 
     return () => clearInterval(interval);
   }, [onFinish]);
@@ -33,31 +32,33 @@ const Preloader = ({ onFinish }) => {
   return (
     <div
       id="preloader-overlay"
-      className="fixed inset-0 z-[9999] bg-black flex items-center justify-center flex-col gap-8"
+      className="fixed inset-0 z-[99999] bg-[#f8fafc] flex items-center justify-center flex-col gap-6 select-none"
     >
-      {/* Glow */}
-      <div className="absolute w-[500px] h-[500px] bg-green-500/20 blur-[150px] top-[-100px] left-[-200px] rounded-full" />
-      <div className="absolute w-[400px] h-[400px] bg-emerald-400/10 blur-[120px] bottom-[-80px] right-[-80px] rounded-full" />
+      {/* Halo subtil émeraude */}
+      <div className="absolute w-[300px] h-[300px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none" />
 
-      {/* Logo + Nom */}
-      <div className="flex items-center gap-3 z-10">
-        <img src="/AM.png" alt="logo" className="w-20 h-15" />
-        {/*<p className="font-bold uppercase tracking-widest text-2xl text-white">
-          Advin <span className="text-green-400">MAHASARO</span>
-        </p>*/}
+      {/* Monogramme / Logo */}
+      <div className="relative flex flex-col items-center gap-3">
+        <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 p-2.5 shadow-lg flex items-center justify-center">
+          <img src="/AM.png" alt="logo" className="w-full h-full object-contain" />
+        </div>
+        <span className="font-display font-bold text-sm tracking-widest text-slate-800">
+          ADVIN MAHASARO
+        </span>
       </div>
 
-      {/* Pourcentage */}
-      <p className="z-10 text-xs text-white/40 tracking-[0.15em] uppercase">
-        {progress < 100 ? `Chargement... ${progress}%` : "Bienvenue !"}
-      </p>
-
-      {/* Barre de progression */}
-      <div className="z-10 w-56 h-[2px] bg-white/10 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-green-400 rounded-full transition-all duration-100"
-          style={{ width: `${progress}%` }}
-        />
+      {/* Barre de progression fine & Compteur */}
+      <div className="w-48 flex flex-col gap-2">
+        <div className="w-full h-[2px] bg-slate-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-100 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <div className="flex justify-between items-center text-[10px] uppercase font-mono tracking-widest text-slate-400">
+          <span>Initialisation</span>
+          <span>{progress}%</span>
+        </div>
       </div>
     </div>
   );
