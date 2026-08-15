@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 import { FaWhatsapp, FaComments, FaTimes, FaPaperPlane } from "react-icons/fa";
 import { HiOutlineSparkles } from "react-icons/hi";
 
-const WHATSAPP_NUMBER = "261345002548";
+const WHATSAPP_NUMBER = "261326167599";
 const N8N_CHAT_WEBHOOK = "https://peter08.app.n8n.cloud/webhook/0fb4f103-d287-49ab-bcef-328c9dc2abc2";
 
 const ChatPopup = ({ onClose }) => {

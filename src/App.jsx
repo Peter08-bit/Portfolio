@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Preloader from "./components/content/Preloader";
 import Navbar from "./components/navbar/Navbar";
 import Cursor from "./components/Cursor";
@@ -14,10 +15,17 @@ import FloatingContact from "./components/content/FloatingContact";
 function App() {
   const [loading, setLoading] = useState(true);
 
+  const handlePreloaderFinish = () => {
+    setLoading(false);
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+  };
+
   return (
     <Router>
       {/* Preloader */}
-      {loading && <Preloader onFinish={() => setLoading(false)} />}
+      {loading && <Preloader onFinish={handlePreloaderFinish} />}
 
       <div className="relative min-h-screen text-slate-900 bg-[#f8fafc] selection:bg-emerald-500/20 selection:text-emerald-800 overflow-x-hidden font-sans">
         {/* Ambiance d'arrière-plan claire et épurée */}

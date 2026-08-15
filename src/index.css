@@ -2,66 +2,241 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =============================================
+   DESIGN TOKENS
+   ============================================= */
+:root {
+  --clr-bg:          #f8fafc;
+  --clr-surface:     #ffffff;
+  --clr-primary:     #059669;
+  --clr-primary-lt:  #10b981;
+  --clr-primary-dk:  #047857;
+  --clr-accent:      #0d9488;
+  --clr-text:        #0f172a;
+  --clr-muted:       #64748b;
+  --clr-border:      rgba(226,232,240,0.85);
+
+  --ease-expo:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-back:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:  cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =============================================
+   BASE
+   ============================================= */
 @layer base {
   html {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #f8fafc;
-    color: #0f172a;
+    background-color: var(--clr-bg);
+    color: var(--clr-text);
+    scroll-behavior: auto; /* GSAP gère le smooth scroll */
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Outfit', sans-serif;
   }
+
+  /* Sélection */
+  ::selection {
+    background: rgba(16,185,129,0.18);
+    color: #065f46;
+  }
 }
 
-/* Glassmorphism & Surface utilities pour thème Blanc / Vert Émeraude */
+/* =============================================
+   GLASSMORPHISM — Surface / Panel
+   ============================================= */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  border: 1px solid var(--clr-border);
+  box-shadow:
+    0 4px 20px -2px rgba(15,23,42,0.05),
+    0 2px 6px -1px rgba(15,23,42,0.02);
 }
 
 .glass-panel-hover {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s var(--ease-expo);
+  will-change: transform, box-shadow, border-color;
 }
 
 .glass-panel-hover:hover {
   background: #ffffff;
-  border-color: rgba(16, 185, 129, 0.45);
-  transform: translateY(-2px);
-  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08), 0 0 20px -4px rgba(16, 185, 129, 0.2);
+  border-color: rgba(16,185,129,0.40);
+  transform: translateY(-3px) scale(1.005);
+  box-shadow:
+    0 20px 40px -10px rgba(15,23,42,0.10),
+    0 0 24px -4px rgba(16,185,129,0.18);
 }
 
-/* Gradient Text Mask Émeraude / Vert */
+/* =============================================
+   GRADIENT TEXT
+   ============================================= */
 .text-gradient {
   background: linear-gradient(135deg, #0f172a 0%, #334155 50%, #64748b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.text-gradient-emerald, .text-gradient-orange {
-  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #0d9488 100%);
+.text-gradient-emerald,
+.text-gradient-orange {
+  background: linear-gradient(135deg, #059669 0%, #10b981 45%, #0d9488 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Scrollbar discrète */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* =============================================
+   REVEAL ANIMATIONS (utilisées par GSAP JS)
+   ============================================= */
+
+/* Élément invisible par défaut — GSAP l'anime */
+.gsap-hidden {
+  opacity: 0;
+  transform: translateY(40px);
+  will-change: transform, opacity;
 }
 
-::-webkit-scrollbar-track {
-  background: #f8fafc;
+/* Word split reveal via clip-path */
+.word-reveal {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.25);
+.word-reveal span {
+  display: inline-block;
+  transform: translateY(100%);
+  will-change: transform;
+}
+
+/* Pin section pendant le scroll */
+.pin-spacer-override {
+  z-index: 1 !important;
+}
+
+/* =============================================
+   PROGRESS BAR SCROLL (Navbar)
+   ============================================= */
+.scroll-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, #059669, #0d9488);
+  border-radius: 0 2px 2px 0;
+  transition: width 0.1s linear;
+}
+
+/* =============================================
+   TILT 3D CARD (About)
+   ============================================= */
+.tilt-card {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  transition: box-shadow 0.3s var(--ease-expo);
+  will-change: transform;
+}
+
+.tilt-card:hover {
+  box-shadow:
+    0 30px 60px -15px rgba(15,23,42,0.15),
+    0 0 40px -8px rgba(16,185,129,0.22);
+}
+
+/* =============================================
+   SHIMMER BUTTON
+   ============================================= */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.25),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: none;
+}
+
+.btn-shimmer:hover::after {
+  animation: shimmer 0.65s ease forwards;
+}
+
+@keyframes shimmer {
+  to { left: 150%; }
+}
+
+/* =============================================
+   KEN BURNS (Projects image)
+   ============================================= */
+.ken-burns {
+  animation: kenBurns 8s ease-in-out infinite alternate;
+}
+
+@keyframes kenBurns {
+  from { transform: scale(1)    translateX(0px); }
+  to   { transform: scale(1.06) translateX(-12px); }
+}
+
+/* =============================================
+   FLOATING ANIMATION
+   ============================================= */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+.float-anim {
+  animation: floatY 4s ease-in-out infinite;
+}
+
+/* =============================================
+   SCROLLBAR
+   ============================================= */
+::-webkit-scrollbar        { width: 5px; height: 5px; }
+::-webkit-scrollbar-track  { background: #f1f5f9; }
+::-webkit-scrollbar-thumb  {
+  background: rgba(100,116,139,0.22);
   border-radius: 9999px;
 }
+::-webkit-scrollbar-thumb:hover { background: rgba(16,185,129,0.65); }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.7);
+/* =============================================
+   CURSOR CUSTOM
+   ============================================= */
+.cursor-dot,
+.cursor-ring {
+  pointer-events: none;
+  position: fixed;
+  border-radius: 50%;
+  z-index: 9999;
+  will-change: transform;
+  mix-blend-mode: normal;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: #059669;
+}
+
+.cursor-ring {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(5,150,105,0.5);
+  background: transparent;
 }
